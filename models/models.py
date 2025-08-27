@@ -49,7 +49,7 @@ class Event(base):
         return True
     
     def __repr__(self):
-        return f"<Event #{self.id} {self.title} on {self.date} at {self.venue}>"
+        return f"Event #{self.id} {self.title} on {self.date} at {self.venue}"
     
 class Attendee(base):
     __tablename__ = "Attendees"
@@ -90,14 +90,13 @@ class Attendee(base):
         return session.query(cls,id_)
     @classmethod
     def delete(cls,id_):
-        obj = cls.find_by_id(id_)
-        if not obj:
-            return False
-        session.delete(obj)
-        session.commit()
-        return True
+        obj = session.query(cls).filter_by(id=id_).first()
+        if obj:
+            session.delete(obj)
+            session.commit()
+            return True
     def __repr__(self):
-        return f"<Attendee #{self.id} {self.name} ({self.email})>"
+        return f"Attendee #{self.id} {self.name} ({self.email})"
     
 if __name__ == "__main__":
     from database import base,engine

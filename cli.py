@@ -3,7 +3,7 @@ from database import session
 from datetime import datetime
 def main_menu():
     while True:
-        print("\n--- Event % Attendee Manager")
+        print("\n--- Event % Attendee Manager---")
         print("1. Manage Events")
         print("2. Manage Attendees")
         print("3. Exit")
