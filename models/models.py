@@ -47,8 +47,9 @@ class Event(base):
         session.delete()
         session.commit()
         return True
+    
     def __repr__(self):
-        return f"<E"
+        return f"<Event #{self.id} {self.title} on {self.date} at {self.venue}"
     
 class Attendee(base):
     __tablename__ = "Attendees"
@@ -59,7 +60,45 @@ class Attendee(base):
 
     event_id = Column(Integer, ForeignKey("events.id"), nullable=False)
 
+    event = relationship("Event", back_populates="attendees")
 
+    @validates("name")
+    def validate_name(self,key,value):
+        if not value or not value.strip():
+            raise ValueError("Name is required!")
+        return value.strip()
+    @validates("email")
+    def validate_email(self,key,value):
+        if not value or "@" not in value:
+            raise ValueError("Provide a valid email address")
+        return value.strip()
+    @validates("phone_number")
+    def validate_phoneNo(self,key,value):
+        if value:
+            digits = "".join(ch for ch in value if ch.isdigit())
+            if len(digits) <7:
+                raise ValueError("Phone number is short")
+            return value
+    @classmethod
+    def create(cls,**kwargs):
+        obj = cls(**kwargs)
+        session.add(obj)
+        session.commit()
+        return obj
+    @classmethod
+    def find_by_id(cls,id_):
+        return session.query(cls).all()
+    @classmethod
+    def delete(cls,id_):
+        obj = cls.find_by_id(id_)
+        if not obj:
+            return False
+        session.add()
+        session.commit()
+        return True
+    def __repr__(self):
+        return f"<Attendee #{self.id} {self.name} ({self.email})"
+    
 if __name__ == "__main__":
     engine = create_engine("sqlite:///events.db")
     base.metadata.create_all(engine)
