@@ -44,12 +44,12 @@ class Event(base):
         obj = cls.find_by_id(id_)
         if not obj:
             return False
-        session.delete()
+        session.delete(obj)
         session.commit()
         return True
     
     def __repr__(self):
-        return f"<Event #{self.id} {self.title} on {self.date} at {self.venue}"
+        return f"<Event #{self.id} {self.title} on {self.date} at {self.venue}>"
     
 class Attendee(base):
     __tablename__ = "Attendees"
@@ -87,18 +87,17 @@ class Attendee(base):
         return obj
     @classmethod
     def find_by_id(cls,id_):
-        return session.query(cls).all()
+        return session.query(cls,id_)
     @classmethod
     def delete(cls,id_):
         obj = cls.find_by_id(id_)
         if not obj:
             return False
-        session.add()
         session.commit()
         return True
     def __repr__(self):
-        return f"<Attendee #{self.id} {self.name} ({self.email})"
+        return f"<Attendee #{self.id} {self.name} ({self.email})>"
     
 if __name__ == "__main__":
-    engine = create_engine("sqlite:///events.db")
+    from database import base,engine
     base.metadata.create_all(engine)
