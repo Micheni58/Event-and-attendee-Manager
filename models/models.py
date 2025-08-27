@@ -93,6 +93,7 @@ class Attendee(base):
         obj = cls.find_by_id(id_)
         if not obj:
             return False
+        session.delete(obj)
         session.commit()
         return True
     def __repr__(self):
