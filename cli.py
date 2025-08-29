@@ -1,31 +1,35 @@
-from models.models import Event, Attendee
+from models.models import Event, Attendee, Ticket
 from database import session
 from datetime import datetime
+
 def main_menu():
     while True:
-        print("\n--- Event & Attendee Manager---")
+        print("\n--- Event & Attendee Manager ---")
         print("1. Manage Events")
         print("2. Manage Attendees")
-        print("3. Exit")
+        print("3. Manage Tickets")
+        print("4. Exit")
 
-        choice = input("Choose an option:").strip()
+        choice = input("Choose an option: ").strip()
 
         if choice == "1":
             manage_events()
-        elif choice =="2":
+        elif choice == "2":
             manage_attendees()
-        elif choice =="3":
-            print("Exiting...Ishiia, Enda Uza uji!")
+        elif choice == "3":
+            manage_tickets()
+        elif choice == "4":
+            print("Exiting... Ishiia, Enda Uza Uji! 😂")
             break
         else:
             print("Invalid choice bro! Acha ufala")
 
 def manage_events():
     while True:
-        print("\n--- Events Menu---")
+        print("\n--- Events Menu ---")
         print("1. Create Event")
         print("2. View all Events")
-        print("3.Delete Event")
+        print("3. Delete Event")
         print("4. Back to Main Menu")
         
         choice = input("Choose an option mzee: ").strip()
@@ -40,8 +44,9 @@ def manage_events():
             break
         else:
             print("Invalid Choice. Try again ama chujaa!!")
+
 def create_event():
-    print("\n--- Create new Event---")
+    print("\n--- Create new Event ---")
     title = input("Enter event title: ")
     venue= input("Enter venue: ")
     budget = int(input("Enter budget: "))
@@ -59,31 +64,32 @@ def create_event():
         try:
             time_obj = datetime.strptime(time_str, "%H:%M")
         except ValueError:
-            print("Invalid time format! Use HH:MM,Kwani haulearn!")
+            print("Invalid time format! Use HH:MM, Kwani haulearn!")
             return
     
-    event = Event.create(title = title, venue=venue,budget=budget,
-                         date=date_obj,time=time_obj)
+    event = Event.create(title=title, venue=venue, budget=budget,
+                         date=date_obj, time=time_obj)
     print(f"The {event.title} created successfully!")
 
 def view_events():
-        print("/n--- All Events---")
-        events = Event.get_all()
-        if not events:
-            print("Labda utengeneze event yako...Msm")
-            return
-        for e in events:
-            print(e)
+    print("\n--- All Events ---")
+    events = Event.get_all()
+    if not events:
+        print("Labda utengeneze event yako... Msee")
+        return
+    for e in events:
+        print(e)
+
 def delete_event():
-        id_ = input("Enter Event ID to delete: ")
-        if Event.delete(int(id_)):
-            print("Event deleted")
-        else:
-            print("Event not found")
+    id_ = input("Enter Event ID to delete: ")
+    if Event.delete(int(id_)):
+        print("Event deleted")
+    else:
+        print("Event not found")
 
 def manage_attendees():
     while True:
-        print("\n---Attendees Menu---")
+        print("\n--- Attendees Menu ---")
         print("1. Create Attendee")
         print("2. View All Attendees")
         print("3. Delete Attendee")
@@ -100,22 +106,23 @@ def manage_attendees():
         elif choice == "4":
             break
         else:
-            print("Invalid choice.Try again")
+            print("Invalid choice. Try again")
+
 def create_attendee():
-    print("\n--- Create New Attendee---")
+    print("\n--- Create New Attendee ---")
     name = input("Enter Name: ")
     email = input("Enter email: ")
-    phone = input("Enter phone number:")
+    phone = input("Enter phone number: ")
 
     events = Event.get_all()
     if not events:
-        print("No events available.Tengeneza yako bana")
+        print("No events available. Tengeneza yako bana")
         return
     print("Select Event ID to assign attendee to:")
     for e in events:
         print(f"{e.id}. {e.title}")
     try:
-        event_id = int(input("Enter event id:"))
+        event_id = int(input("Enter event id: "))
     except ValueError:
         print("Invalid ID")
         return
@@ -125,19 +132,91 @@ def create_attendee():
     print(f"Attendee {attendee.name} created successfully")
 
 def view_attendees():
-        print("\n---All Attendees---")
-        attendees = session.query(Attendee).all()
-        if not attendees:
-            print("No attendees found")
-            return
-        for a in attendees:
-            print(a)
+    print("\n--- All Attendees ---")
+    attendees = session.query(Attendee).all()
+    if not attendees:
+        print("No attendees found")
+        return
+    for a in attendees:
+        print(a)
+
 def delete_attendee():
-        id_ = input("Enter Attendee ID to delete:")
-        if Attendee.delete(int(id_)):
-            print("Attendee deleted")
+    id_ = input("Enter Attendee ID to delete: ")
+    if Attendee.delete(int(id_)):
+        print("Attendee deleted")
+    else:
+        print("Attendee not found")
+
+def manage_tickets():
+    while True:
+        print("\n--- Tickets Menu ---")
+        print("1. Create Ticket")
+        print("2. View All Tickets")
+        print("3. Delete Ticket")
+        print("4. Back to Main Menu")
+
+        choice = input("Choose an option: ").strip()
+
+        if choice == "1":
+            create_ticket()
+        elif choice == "2":
+            view_tickets()
+        elif choice == "3":
+            delete_ticket()
+        elif choice == "4":
+            break
         else:
-            print("Attendee not found")
+            print("Invalid choice. Try again")
+
+def create_ticket():
+    print("\n--- Create New Ticket ---")
+    try:
+        price = int(input("Enter ticket price: "))
+    except ValueError:
+        print("Invalid price format!")
+        return
+    
+    events = Event.get_all()
+    if not events:
+        print("No events available. Tengeneza kwanza")
+        return
+    
+    print("Select Event ID for this ticket:")
+    for e in events:
+        print(f"{e.id}. {e.title}")
+    
+    try:
+        event_id = int(input("Enter event id: "))
+    except ValueError:
+        print("Invalid ID format!")
+        return
+
+    ticket = Ticket.create(price=price, event_id=event_id)
+    print(f"Ticket {ticket.id} created successfully for event {event_id}")
+
+
+def view_tickets():
+    print("\n--- All Tickets ---")
+    tickets = Ticket.get_all()
+    if not tickets:
+        print("No tickets found")
+        return
+    for t in tickets:
+        print(t)
+
+
+def delete_ticket():
+    try:
+        id_ = int(input("Enter Ticket ID to delete: "))
+    except ValueError:
+        print("Invalid ID format!")
+        return
+    
+    if Ticket.delete(id_):
+        print("Ticket deleted")
+    else:
+        print("Ticket not found")
+
 
 if __name__ == "__main__":
     main_menu()

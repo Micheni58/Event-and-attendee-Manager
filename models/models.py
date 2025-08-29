@@ -133,6 +133,27 @@ class Ticket(base):
     def __repr__(self):
         return f"Ticket #{self.id} for Event {self.event_id} - Price: {self.price}"
 
+    # FIXED: mark as classmethod
+    @classmethod
+    def create(cls, price, event_id):
+        ticket = cls(price=price, event_id=event_id)
+        session.add(ticket)
+        session.commit()
+        return ticket
+
+    @classmethod
+    def get_all(cls):
+        return session.query(cls).all()
+
+    @classmethod
+    def delete(cls, id_):
+        ticket = session.get(cls, id_)
+        if ticket:
+            session.delete(ticket)
+            session.commit()
+            return True
+        return False
+
 
 if __name__ == "__main__":
     from database import base, engine
